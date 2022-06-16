@@ -135,6 +135,33 @@ class AutoHideScrollbar(tk.Scrollbar):
         tk.Scrollbar.set(self, lo, hi)
 
 
+class ScrollableListbox(tk.Frame):
+    def __init__(self, parent, title, list_var, command, **kwargs):
+        tk.Frame.__init__(self, parent, **kwargs)
+
+        self.title = tk.Label(self, text=title)
+        self.title.pack(side='top')
+
+        listbox = tk.Listbox(self, listvariable=list_var, exportselection=False)
+        listbox.pack(side="left", fill="both", expand=True)
+        listbox.bind('<<ListboxSelect>>', lambda event: self.on_select(event.widget, command))
+
+        scrollbar = tk.Scrollbar(self, orient="vertical")
+        scrollbar.config(command=listbox.yview)
+        scrollbar.pack(side="right", fill="y")
+
+        listbox.config(yscrollcommand=scrollbar.set)
+    
+        self.listbox = listbox
+
+    def on_select(self, lb, command):
+        selection = lb.curselection()
+        print(selection)
+        if len(selection) > 0:
+            command(selection[0], lb.get(selection[0]))
+
+
+
 class SizeEntry(tk.Frame):
     def __init__(self, parent, var:tk.StringVar, command=None, width:int=5, **kwargs):
         tk.Frame.__init__(self, parent, **kwargs)
@@ -211,3 +238,47 @@ class Dropdown(ttk.Frame):
             self.combobox.bind('<<ComboboxSelected>>', command)
         self.combobox.pack(side='bottom')
     
+
+class AskStringDialog(tk.Toplevel):
+    def __init__(self, title='', prompt='', initialvalue=None, w=300, h=100):
+        root = tk.Tk() # temp root
+        root.withdraw()
+
+        tk.Toplevel.__init__(self, root)
+        self.title(title)
+        self.resizable(width=True, height=False)
+        x, y = (self.winfo_screenwidth() - w) // 2, (self.winfo_screenheight() - h) // 2
+        self.geometry(f'{w}x{h}+{x}+{y}')
+        self.attributes("-topmost", True)
+
+        tk.Label(self, text=prompt, anchor='w').pack(fill='x', expand=True, padx=10)
+        self.entry = ttk.Entry(self)
+        self.entry.pack(fill='x', expand=True, padx=10)
+        self.entry.bind('<Return>', lambda event: self.cmd_ok())
+        if initialvalue is not None:
+            self.entry.insert(0, initialvalue)
+            self.entry.select_range(0, 'end')
+
+        btn_frame = tk.Frame(self)
+        btn_frame.pack(padx=5, pady=5)
+        tk.Button(btn_frame, text='OK', width=10, command=self.cmd_ok).pack(side='left', padx=5)
+        tk.Button(btn_frame, text='Cancel', width=10, command=self.destroy).pack(side='right', padx=5)
+
+        # set focus on pop window
+        self.lift()
+        self.focus_force()
+        self.entry.focus_set() # focus entry widget
+
+        self.value = None
+
+        self.wait_window() # pause calling thread until this window is closed/destroyed
+        root.destroy() # remove temp root
+
+    def cmd_ok(self):
+        self.value = self.entry.get()
+        self.destroy()
+
+    @staticmethod
+    def show(title='', prompt='', initialvalue=None):
+        d = AskStringDialog(title=title, prompt=prompt, initialvalue=initialvalue)
+        return d.value
