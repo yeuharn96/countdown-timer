@@ -156,7 +156,6 @@ class ScrollableListbox(tk.Frame):
 
     def on_select(self, lb, command):
         selection = lb.curselection()
-        print(selection)
         if len(selection) > 0:
             command(selection[0], lb.get(selection[0]))
 

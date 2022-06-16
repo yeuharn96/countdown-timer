@@ -83,12 +83,14 @@ class AppSetting:
   def merge_to_stringvar(s1, s2):
     def assign(s1, s2, key):
       if isinstance(s1[key], tk.StringVar): s1[key].set(s2[key])
+      else: s1[key] = s2[key]
     return AppSetting.merge(s1, s2, assign)
 
   @staticmethod
   def merge_from_stringvar(s1, s2):
     def assign(s1, s2, key):
       if isinstance(s2[key], tk.StringVar): s1[key] = s2[key].get()
+      else: s1[key] = s2[key]
     return AppSetting.merge(s1, s2, assign)
 
   @staticmethod

@@ -79,10 +79,16 @@ class OutputPane(tk.Frame):
       x, y, w, h = mon[1][0], mon[1][1], mon[1][2]-mon[1][0], mon[1][3]-mon[1][1]
     
     # print('calc',x,y,w,h)
-    y += int(self.setting['adj_pos']['top'].get())
-    x += int(self.setting['adj_pos']['left'].get())
-    w += int(self.setting['adj_pos']['right'].get())
-    h += int(self.setting['adj_pos']['bottom'].get())
+    def calc_adj_pos(pos, geo):
+      val = self.setting['adj_pos'][pos].get()
+      try: val = int(val)
+      except: val = 0
+      geo += val
+      return 0 if geo < 0 else geo
+    y = calc_adj_pos('top', y)
+    x = calc_adj_pos('left', x)
+    w = calc_adj_pos('right', w)
+    h = calc_adj_pos('bottom', h)
     # print('calc2',x,y,w,h)
 
     self.win_output.geometry("{}x{}+{}+{}".format(w,h,x,y))
