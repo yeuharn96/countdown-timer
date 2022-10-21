@@ -133,15 +133,14 @@ if __name__ == "__main__":
     SW_MAXIMIZE = 3
     SW_MINIMIZE = 6
     #==========================
-    CountdownTimer()
     
-    # try:
-    #     if not DEBUG_FLAG:
-    #         # hide console window
-    #         ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), SW_HIDE)
-    #     CountdownTimer()
-    # except Exception as e:
-    #     title = 'Error'
-    #     text = str(e)
-    #     ctypes.windll.user32.MessageBoxW(0, text, title, MB_OK | ICON_ERROR)
+    try:
+        if not DEBUG_FLAG:
+            # hide console window
+            ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), SW_HIDE)
+        CountdownTimer()
+    except Exception as e:
+        title = 'Error'
+        text = str(e)
+        ctypes.windll.user32.MessageBoxW(0, text, title, MB_OK | ICON_ERROR)
   
